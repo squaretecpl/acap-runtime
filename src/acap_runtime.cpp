@@ -116,6 +116,10 @@ int RunServer(
    shared_ptr<ServerCredentials> creds = SslServerCredentials(ssl_opts);
    builder.AddListeningPort(server_address.str(), creds);
  }
+ 
+ builder.SetMaxSendMessageSize(-1);
+ builder.SetMaxMessageSize(-1);
+ builder.SetMaxReceiveMessageSize(-1);
  LOG(INFO) << "Server listening on " << server_address.str() << endl;
  
  // Register parameter service
