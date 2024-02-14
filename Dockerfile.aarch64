@@ -16,8 +16,7 @@ WORKDIR ${TARGETSYSROOT}/usr/lib
 RUN [ -z "$(ls libabsl*.so*)" ] || rm -f libabsl*.so*
 
 # Install openssl (to use instead of boringssl)
-RUN <<EOF
-apt-get update
+RUN apt-get update && \
 apt-get install -y --no-install-recommends \
     pkg-config \
     g++ \
@@ -25,18 +24,15 @@ apt-get install -y --no-install-recommends \
     libssl-dev \
     gnupg \
     openssl
-EOF
 
 # Install Edge TPU compiler
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN <<EOF
-echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" \
-    | tee /etc/apt/sources.list.d/coral-edgetpu.list
-curl -k https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-apt-get update
+RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" \
+    | tee /etc/apt/sources.list.d/coral-edgetpu.list && \
+curl -k https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+apt-get update && \
 apt-get install -y --no-install-recommends \
     edgetpu-compiler
-EOF
 
 # Get testdata models
 WORKDIR /opt/app/testdata
@@ -81,7 +77,7 @@ WORKDIR /opt
 # We do this because we need to be able to run protoc and grpc_cpp_plugin
 # while cross-compiling.
 RUN <<EOF
-git clone -b v1.46.3 https://github.com/grpc/grpc
+git clone -b v1.46.x https://github.com/grpc/grpc
 cd grpc
 git submodule update --init
 EOF
